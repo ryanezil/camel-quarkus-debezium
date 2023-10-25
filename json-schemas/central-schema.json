@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Central user JSON schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "remoteId": {
+      "type": "number"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "dni": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "gender": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "remoteId",
+    "firstName",
+    "lastName",
+    "dni"
+  ]
+}
