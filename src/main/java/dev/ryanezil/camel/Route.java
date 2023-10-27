@@ -6,12 +6,7 @@ import java.util.Random;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.mongodb.MongoDbConstants;
-import org.apache.camel.dataformat.avro.AvroDataFormat;
 import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.camel.model.rest.RestBindingMode;
-
-import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 
 import dev.ryanezil.camel.model.CommonUser;
 
@@ -57,8 +52,10 @@ public class Route extends RouteBuilder {
                 .log("DBZ op='u' - A record was updated: operation not implemented")
             .when(header("dbz_operation").isEqualTo("d"))
                 .log("DBZ op='d' - A record was deleted: operation not implemented")
+            .when(header("dbz_operation").isEqualTo("r"))
+                .log("DBZ op='r' - A record was read (Snapshot event): operation not implemented")                
             .otherwise()
-                .log("DBZ op='r' - The record was read from table: operation not implemented")
+                .log("Unknown Debezium operation")
             .end();
 
             
@@ -76,7 +73,6 @@ public class Route extends RouteBuilder {
                     commonUser.setId(random.nextLong());                    
                 }
             })
-            //.to("direct:show-body-classtype");
             // SEE operations here: https://camel.apache.org/components/3.21.x/mongodb-component.html#_endpoint_query_option_operation
             .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=insert")
             .log("Inserted MongoDB JSON ${body}");
