@@ -1,7 +1,6 @@
 package dev.ryanezil.camel;
 
-
-import java.util.Random;
+import java.time.Instant;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -33,6 +32,20 @@ public class Route extends RouteBuilder {
         .log("    on the partition ${headers[kafka.PARTITION]}")
         .log("    with the offset ${headers[kafka.OFFSET]}")
         .log("    with the key ${headers[kafka.KEY]}")
+        .choice()
+            /*
+             * A database DELETE operation causes Debezium to generate two Kafka records:
+             *     1. A record that contains "op": "d", the before row data, and some other fields.
+             *     2. A tombstone record that has the same key as the deleted row and a value of null.
+             *     This record is a marker for Apache Kafka. It indicates that log compaction can
+             *     remove all records that have this key.
+            */        
+            .when(body().isNull()).log("Record ignored: the message body is NULL")
+            .otherwise().to("direct:process-record")
+        .endChoice();
+
+
+        from("direct:process-record")
         .convertBodyTo(String.class)
         .setHeader("dbz_operation").jsonpath("$.op")
         .setHeader("dbz_source_db").jsonpath("$.source.db")
@@ -42,40 +55,74 @@ public class Route extends RouteBuilder {
         .log("  >> SourceDB = ${header.dbz_source_db}")
         .log("  >> SourceTABLE = ${header.dbz_source_table}")
         .choice()
+            .when(body().isNull())
+                .log("The received message body is nULL")
+
             .when(header("dbz_operation").isEqualTo("c"))
                 .log("DBZ op='c' - A record was created/inserted")
                 .setBody().jsonpath("$.after").marshal().json(true)
                 .log("The retrieved Debezium 'after' block is:\n${body}")
-                .to("direct:inserted-record")
+                .to("direct:upsert-record")
             
             .when(header("dbz_operation").isEqualTo("u"))
-                .log("DBZ op='u' - A record was updated: operation not implemented")
+                .log("DBZ op='u' - A record was updated")
+                .setBody().jsonpath("$.after").marshal().json(true)
+                .log("The retrieved Debezium 'after' block is:\n${body}")
+                .to("direct:upsert-record")
+
             .when(header("dbz_operation").isEqualTo("d"))
-                .log("DBZ op='d' - A record was deleted: operation not implemented")
+                .log("DBZ op='d' - A record was deleted")
+                .setBody().jsonpath("$.before").marshal().json(true)
+                .log("The retrieved Debezium 'before' block is:\n${body}")
+                .to("direct:deleted-record")
+                
             .when(header("dbz_operation").isEqualTo("r"))
-                .log("DBZ op='r' - A record was read (Snapshot event): operation not implemented")                
+                .log("DBZ op='r' - A record was read (Snapshot event): operation not implemented")
+
             .otherwise()
                 .log("Unknown Debezium operation")
+            
             .end();
 
-            
 
-        from("direct:inserted-record")
-            //Mapping JSON formats
+        from("direct:upsert-record")
+             //Mapping JSON format from DBZ to CommonUser
             .toD("atlasmap:atlasmap-mappings/{{atlasmap.mapper}}")
             .unmarshal().json(JsonLibrary.Jackson, CommonUser.class )
-            .log("Mapped content >>>> ${body}")
+            .enrich("direct:enrich", new MergeStrategy())
             .process(new Processor() {
-                // Setting a random ID with a long value
+                // Enriching the document setting the 'Document last update time' using a Camel Processor
                 public void process(Exchange exchange) throws Exception {
+                    String sourceDatabase = exchange.getIn().getHeader("dbz_source_db",String.class);
+                    String sourceTable = exchange.getIn().getHeader("dbz_source_table",String.class);
+
                     CommonUser commonUser = exchange.getIn().getBody(CommonUser.class);
-                    Random random = new Random();
-                    commonUser.setId(random.nextLong());                    
+                    commonUser.setEnriched("Document updated at UTC time [" + Instant.now().toString() 
+                        +"] from remote table [" + sourceDatabase +"." + sourceTable +"]");
                 }
-            })
+            })            
             // SEE operations here: https://camel.apache.org/components/3.21.x/mongodb-component.html#_endpoint_query_option_operation
-            .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=insert")
-            .log("Inserted MongoDB JSON ${body}");
+            .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=save")
+            .log("SAVED MongoDB JSON ${body}");
+
+        from("direct:enrich")
+            // retrieves only one element from the collection whose _id field matches the content of the IN message body
+            .setBody(simple("${body.get_id()}"))
+            .log("Looking for MongoDB document with _id=[${body}]")
+            .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=findById")
+            //The returned object is a BSON object. We marshall it to JSON and then unmarshal the JSON to a CommonUser object.
+            .marshal().json(JsonLibrary.Jackson)
+            .unmarshal().json(JsonLibrary.Jackson, CommonUser.class );
+
+
+        from("direct:deleted-record")
+            // The IN message body will act as the removal filter query
+            // Mapping JSON format from DBZ to CommonUser
+            .toD("atlasmap:atlasmap-mappings/{{atlasmap.mapper}}")
+            .log("DELETING body=[${body}]")
+            // SEE operations here: https://camel.apache.org/components/3.21.x/mongodb-component.html#_endpoint_query_option_operation
+            .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=remove")
+            .log("DELETED MongoDB JSON ${body}");
 
     } //END configure() method
 

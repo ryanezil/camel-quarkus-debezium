@@ -10,59 +10,44 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public class CommonUser implements Serializable {
 
     @JsonProperty
-    private long id;    
+    private String _id;
     
     @JsonProperty
-    private long remoteId;
+    private Long remoteId;
 
     @JsonProperty
-    private String dni;
-    
-    @JsonProperty
-    private String email;
-    
-    @JsonProperty
     private String firstName;
-    
-    @JsonProperty
-    private String gender;
 
     @JsonProperty
     private String lastName;
 
     @JsonProperty
+    private String enriched;
+    
+    @JsonProperty
+    private String email;
+
+    @JsonProperty
     private String phone;
 
-    public long getId() {
-        return id;
+    @JsonProperty
+    private String gender;
+
+
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public long getRemoteId() {
+    public Long getRemoteId() {
         return remoteId;
     }
 
-    public void setRemoteId(long remoteId) {
+    public void setRemoteId(Long remoteId) {
         this.remoteId = remoteId;
-    }
-
-    public String getDni() {
-        return dni;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getFirstName() {
@@ -73,20 +58,29 @@ public class CommonUser implements Serializable {
         this.firstName = firstName;
     }
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEnriched() {
+        return enriched;
+    }
+
+    public void setEnriched(String enriched) {
+        this.enriched = enriched;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {
@@ -97,10 +91,19 @@ public class CommonUser implements Serializable {
         this.phone = phone;
     }
 
-    @Override
-    public String toString() {
-        return "CommonUser [id=" + id + ", remoteId=" + remoteId + ", dni=" + dni + ", email=" + email + ", firstName="
-                + firstName + ", gender=" + gender + ", lastName=" + lastName + ", phone=" + phone + "]";
+    public String getGender() {
+        return gender;
     }
 
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "CommonUser [_id=" + _id + ", remoteId=" + remoteId + ", firstName=" + firstName + ", lastName="
+                + lastName + ", enriched=" + enriched + ", email=" + email + ", phone=" + phone + ", gender=" + gender
+                + "]";
+    }
+    
 }

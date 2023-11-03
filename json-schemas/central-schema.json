@@ -3,8 +3,8 @@
   "title": "Central user JSON schema",
   "type": "object",
   "properties": {
-    "id": {
-      "type": "number"
+    "_id": {
+      "type": "string"
     },
     "remoteId": {
       "type": "number"
@@ -15,7 +15,7 @@
     "lastName": {
       "type": "string"
     },
-    "dni": {
+    "enriched": {
       "type": "string"
     },
     "email": {
@@ -29,10 +29,10 @@
     }
   },
   "required": [
-    "id",
+    "_id",
     "remoteId",
     "firstName",
     "lastName",
-    "dni"
+    "enriched"
   ]
 }

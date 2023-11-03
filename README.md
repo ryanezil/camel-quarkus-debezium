@@ -34,9 +34,14 @@ Process flow:
     ![Atlasmap - Portugal schema to POJO mapping](pictures/portugal-mapping.png)
 
 
-3. It enriches the POJO with additional data (just adding a generated ID value to the document).
+3. It enriches the POJO with additional data (just adding the last time the document was updated).
 
-4. It creates/inserts a new document into a MongoDB collection persisting the POJO.
+4. Depending on the debezium event:
+   
+   + It creates/inserts a new document into a MongoDB collection persisting the POJO.
+   + It updates the previous existing document in MongoDB
+   + It deletes the document in MongoDB
+
 
 
 ## Running the application in dev mode
