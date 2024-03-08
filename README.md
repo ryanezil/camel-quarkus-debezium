@@ -1,8 +1,8 @@
 # Camel Quarkus and Debezium
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework. If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+This project uses Quarkus, the Supersonic Subatomic Java Framework. If you want to learn more about Quarkus, please visit its website: https://quarkus.io .
 
-The microservice is implemented with Camel extensions for Quarkus.
+The microservice is implemented using [Red Hat build of Apache Camel for Quarkus](https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.0/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index) and [Camel 4.0.0](https://camel.apache.org/releases/release-4.0.0).
 
 ## Scenario
 
@@ -11,32 +11,32 @@ The microservice is implemented with Camel extensions for Quarkus.
 
 Process flow:
 
-1. The microservice consumes _Debezium_ events from a Kafka topic
-   + Events are extracted from a remote SQL database by a Debezium KafkaConnector already deployed and running. Debezium serializes the events using [AVRO](https://avro.apache.org/) and publishes the schemas into the [Apicurio Registry](https://www.apicur.io/registry/) and the events into a Kafka topic.
-   + The **Camel Kafka** component consumes the events from the topic and it is also connected to the Apicurio Registry to deserialize the events from AVRO to JSON.
+1. The microservice consumes _Debezium_ generated events from a Kafka topic
+   + Events are extracted from a remote SQL database by a Debezium KafkaConnector already deployed and running. Debezium serializes the events using [AVRO](https://avro.apache.org/), publishes the event schema files into the [Apicurio Registry](https://www.apicur.io/registry/) and send the events into a Kafka topic.
+   + The **Camel Kafka** component consumes the events from the topic, and uses the schemas retrieved from the Apicurio Registry to deserialize them from AVRO to JSON.
 
-2. The microservice maps the consumed event into a target POJO/entity by using [AtlasMap](https://www.atlasmap.io/)
+2. The microservice maps the consumed JSON event into a target canonical JSON by using [JSLT](https://github.com/schibsted/jslt). Then the canonical JSON information is moved to a POJO/entity class.
    + The microservice configuration defines which mapper is used.
    + There are two mappers included in the project, for two different source JSON schemas (`france` and `portugal`):
-     + france-to-central-mapping.adm
-     + portugal-to-central-mapping.adm
+     + france-to-central-mapping.jslt
+     + portugal-to-central-mapping.jslt
    
-     Both of them map the values to the same target POJO (the `central` JSON schema).
+     Both of them map the values to the same target JSON schema (the `canonical` JSON schema).
    
-   + The mapping also applies some basic transformations (trimming spaces and it changes some text to uppercase).
+   + The mapping also applies some basic transformations (trimming spaces and it changes a field to uppercase).
 
-    Example: mapping records from the SQL _France_ table into the POJO
+    Example: mapping records from the SQL _France_ table into the canonical JSON schema:
 
-    ![Atlasmap - France schema to POJO mapping](pictures/france-mapping.png)
+    ![France schema to POJO mapping](pictures/france-mapping.png)
 
-    Example: mapping records from the SQL _Portugal_ table into the POJO
+    Example: mapping records from the SQL _Portugal_ table into the canonical JSON schema:
 
-    ![Atlasmap - Portugal schema to POJO mapping](pictures/portugal-mapping.png)
+    ![Portugal schema to POJO mapping](pictures/portugal-mapping.png)
 
 
 3. It enriches the POJO with additional data (just adding the last time the document was updated).
 
-4. Depending on the debezium event:
+4. Depending on the debezium event type:
    
    + It creates/inserts a new document into a MongoDB collection persisting the POJO.
    + It updates the previous existing document in MongoDB

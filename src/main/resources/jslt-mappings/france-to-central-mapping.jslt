@@ -1,0 +1,8 @@
+{
+  "_id" : trim(uppercase(.dni)),
+  "remoteId" : .id,
+  "firstName" : .firstName,
+  "lastName" : .lastName,
+  "phone" : .phone,
+  "gender" : .gender
+}

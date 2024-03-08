@@ -1,0 +1,52 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: dbz-msusers-connector
+  labels:
+    # The strimzi.io/cluster label identifies the KafkaConnect instance
+    # in which to create this connector. That KafkaConnect instance
+    # must have the strimzi.io/use-connector-resources annotation
+    # set to true.
+    strimzi.io/cluster: my-connect-single-node-cluster
+
+spec:
+# https://access.redhat.com/documentation/id-id/red_hat_integration/2023.q2/html-single/debezium_user_guide/index#debezium-connector-for-mysql
+
+# See config documentation: https://github.com/debezium/debezium-examples/blob/main/tutorial/register-mysql-apicurio-converter-avro.json
+
+  class: io.debezium.connector.mysql.MySqlConnector
+  tasksMax: 1
+
+  config:
+    errors.log.enable: true
+    database.hostname: msusers.mariadb.svc.cluster.local
+    database.port: 3306
+    database.user: root
+    database.password: root
+    database.server.id: "654321"
+    # Logical name that identifies and provides a namespace for the particular
+    # MySQL database server/cluster in which Debezium is capturing changes.
+    # The logical name should be unique across all other connectors, since it is
+    # used as a prefix for all Kafka topic names that receive events emitted by this connector
+    database.server.name: "msusers"
+    # database.dbname: msusers
+    database.whitelist: msusers   
+    # table.whitelist: mytable
+    topic.prefix: "mariadb"
+    # Example table: <prefix>.<database>.<tablename>   --> mariadb.msusers.citizen
+    schema.history.internal.kafka.topic: "msusers.schema.history"
+    schema.history.internal.kafka.bootstrap.servers: 'single-node-cluster-kafka-bootstrap:9092'
+    include.schema.changes: "false"
+
+    # Register AVRO schema into Service Registry
+    schema.name.adjustment.mode: avro
+    key.converter: io.apicurio.registry.utils.converter.AvroConverter
+    key.converter.apicurio.registry.url: http://demo-apicurioregistry-service:8080/apis/registry/v2
+    key.converter.apicurio.registry.auto-register: true
+    key.converter.apicurio.registry.find-latest: true
+    value.converter: io.apicurio.registry.utils.converter.AvroConverter
+    value.converter.apicurio.registry.url: http://demo-apicurioregistry-service:8080/apis/registry/v2
+    value.converter.apicurio.registry.auto-register: true
+    value.converter.apicurio.registry.find-latest: true
+
+

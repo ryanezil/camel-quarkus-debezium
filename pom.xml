@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.ryanezil</groupId>
   <artifactId>camel-quarkus-dbz</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <properties>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
@@ -15,9 +15,10 @@
 
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>com.redhat.quarkus.platform</quarkus.platform.group-id>
-    <!-- https://access.redhat.com/documentation/en-us/red_hat_integration/2023.q1/html-single/release_notes_for_red_hat_integration_2023.q1/index#camel-quarkus-relnotes_integration -->
-    <quarkus.platform.version>2.13.8.SP3-redhat-00001</quarkus.platform.version>
-    <skipITs>true</skipITs>
+    <!-- Release notes for Red Hat build of Apache Camel 4.0 -->
+    <!-- https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.0/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index -->
+    <!-- Get the latest 3.2.x version from https://maven.repository.redhat.com/ga/com/redhat/quarkus/platform/quarkus-bom -->
+    <quarkus.platform.version>3.2.10.Final-redhat-00002</quarkus.platform.version>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
 
     <!-- Tests are unstable -->
@@ -77,10 +78,10 @@
       <artifactId>camel-quarkus-mongodb</artifactId>
     </dependency>
 
-    <!-- Atlasmap mappings -->
+    <!-- JSON mappings using JSLT -->
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-atlasmap</artifactId>
+      <artifactId>camel-quarkus-jslt</artifactId>
     </dependency>    
 
     <!-- enable direct:xxx URIs -->
@@ -204,17 +205,16 @@
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
-            <configuration>
-              <systemPropertyVariables>
-                <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
-                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                <maven.home>${maven.home}</maven.home>
-              </systemPropertyVariables>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+            <maven.home>${maven.home}</maven.home>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
-
     </plugins>
   </build>
 

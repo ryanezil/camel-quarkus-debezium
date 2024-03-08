@@ -87,7 +87,7 @@ public class Route extends RouteBuilder {
 
         from("direct:upsert-record")
              //Mapping JSON format from DBZ to CommonUser
-            .toD("atlasmap:atlasmap-mappings/{{atlasmap.mapper}}")
+            .toD("jslt:jslt-mappings/{{jslt.mapper}}")
             .unmarshal().json(JsonLibrary.Jackson, CommonUser.class )
             .enrich("direct:enrich", new MergeStrategy())
             .process(new Processor() {
@@ -97,11 +97,11 @@ public class Route extends RouteBuilder {
                     String sourceTable = exchange.getIn().getHeader("dbz_source_table",String.class);
 
                     CommonUser commonUser = exchange.getIn().getBody(CommonUser.class);
-                    commonUser.setEnriched("Document updated at UTC time [" + Instant.now().toString() 
+                    commonUser.setEnriched("Document latest change was UTC time [" + Instant.now().toString() 
                         +"] from remote table [" + sourceDatabase +"." + sourceTable +"]");
                 }
             })            
-            // SEE operations here: https://camel.apache.org/components/3.21.x/mongodb-component.html#_endpoint_query_option_operation
+            // SEE operations here: https://camel.apache.org/components/4.0.x/mongodb-component.html#_endpoint_query_option_operation
             .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=save")
             .log("SAVED MongoDB JSON ${body}");
 
@@ -118,9 +118,9 @@ public class Route extends RouteBuilder {
         from("direct:deleted-record")
             // The IN message body will act as the removal filter query
             // Mapping JSON format from DBZ to CommonUser
-            .toD("atlasmap:atlasmap-mappings/{{atlasmap.mapper}}")
+            .toD("jslt:jslt-mappings/{{jslt.mapper}}")
             .log("DELETING body=[${body}]")
-            // SEE operations here: https://camel.apache.org/components/3.21.x/mongodb-component.html#_endpoint_query_option_operation
+            // SEE operations here: https://camel.apache.org/components/4.0.x/mongodb-component.html#_endpoint_query_option_operation
             .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=remove")
             .log("DELETED MongoDB JSON ${body}");
 
