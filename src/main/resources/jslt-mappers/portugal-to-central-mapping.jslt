@@ -1,0 +1,7 @@
+{
+  "_id" : trim(uppercase(.dni)),
+  "remoteId" : .id,
+  "firstName" : .firstName,
+  "lastName" : .lastName,
+  "email" : .email
+}
