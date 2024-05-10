@@ -107,26 +107,26 @@ This microservice is already built (both native and non-native) and the images a
 
 1. Package application
 
-```bash
-# Ensure you are using java-21
-# export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
+   ```bash
+   # Ensure you are using java-21
+   # export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
 
-./mvnw clean package
+   ./mvnw clean package
 ```
 
 2. Build container image
 
    Remember to tag the result image with your desired target repository.
 
-```bash
-podman build -f src/main/docker/Dockerfile.jvm -t quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT .
-```
+   ```bash
+   podman build -f src/main/docker/Dockerfile.jvm -t quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT .
+   ```
 
 3. Upload to image registry
 
-```bash
-podman push quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT
-```
+   ```bash
+   podman push quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT
+   ```
 
 
 ### How to build - Native image
