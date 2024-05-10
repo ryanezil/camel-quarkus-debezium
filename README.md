@@ -112,7 +112,7 @@ This microservice is already built (both native and non-native) and the images a
    # export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
 
    ./mvnw clean package
-```
+   ```
 
 2. Build container image
 
