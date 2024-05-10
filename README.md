@@ -98,7 +98,7 @@ If you want to learn more about building native executables, please consult http
 
 ## Building Application Image
 
-This microservice is already built (both native and non-native) and the images is available here:
+This microservice is already built (both native and non-native) and the images are available here:
 
 * ```quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT```.
 * ```quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT```.
@@ -134,26 +134,26 @@ podman push quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT
 
 1. Package application
 
-```bash
-# Ensure you are using java-21
-# export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
+   ```bash
+   # Ensure you are using java-21
+   # export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
 
-./mvnw clean package -Dnative -Dquarkus.native.container-build=true
-```
+   ./mvnw clean package -Dnative -Dquarkus.native.container-build=true
+   ```
 
 2. Build container image
 
    Remember to tag the result image with your desired target repository.
 
-```bash
-podman build -f src/main/docker/Dockerfile.native-micro -t quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT .
-```
+   ```bash
+   podman build -f src/main/docker/Dockerfile.native-micro -t quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT .
+   ```
 
 3. Upload to image registry
 
-```bash
-podman push quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT
-```
+   ```bash
+   podman push quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT
+   ```
 
 ## Prepare OpenShift environment
 
