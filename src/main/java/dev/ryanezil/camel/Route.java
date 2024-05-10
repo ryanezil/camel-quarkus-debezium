@@ -87,7 +87,7 @@ public class Route extends RouteBuilder {
 
         from("direct:upsert-record")
              //Mapping JSON format from DBZ to CommonUser
-            .toD("jslt:jslt-mappings/{{jslt.mapper}}")
+            .toD("jslt:{{jslt.mapper}}")
             .unmarshal().json(JsonLibrary.Jackson, CommonUser.class )
             .enrich("direct:enrich", new MergeStrategy())
             .process(new Processor() {
@@ -118,7 +118,7 @@ public class Route extends RouteBuilder {
         from("direct:deleted-record")
             // The IN message body will act as the removal filter query
             // Mapping JSON format from DBZ to CommonUser
-            .toD("jslt:jslt-mappings/{{jslt.mapper}}")
+            .toD("jslt:{{jslt.mapper}}")
             .log("DELETING body=[${body}]")
             // SEE operations here: https://camel.apache.org/components/4.0.x/mongodb-component.html#_endpoint_query_option_operation
             .to("mongodb:camelMongoClient?database={{mongodb.database}}&collection={{mongodb.users.collection}}&operation=remove")

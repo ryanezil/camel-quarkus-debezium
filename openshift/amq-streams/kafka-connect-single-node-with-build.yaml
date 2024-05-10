@@ -20,14 +20,11 @@ spec:
     - name: debezium-connector-mysql
       artifacts:
       - type: zip
-        url: https://maven.repository.redhat.com/ga/io/debezium/debezium-connector-mysql/2.3.7.Final-redhat-00001/debezium-connector-mysql-2.3.7.Final-redhat-00001-plugin.zip
-        sha512sum: dc932541c5d56774cd754a586d94b22fa56296fff715b78cfee39d0131df5a1b55dabf884917b475c9d11bdfc086b0d2c1b6c97e7fd1888b4d577d9f06492c59
+        url: https://maven.repository.redhat.com/ga/io/debezium/debezium-connector-mysql/2.5.4.Final-redhat-00001/debezium-connector-mysql-2.5.4.Final-redhat-00001-plugin.zip
+        sha512sum: eac4956994316c76a9eefe480fa7711f3b3b0c6440a25afe8d0d753abf06161476fbab39f4af8a81a2f594ffa17e47778edd3ed8451e6009c26740b7d073acd1
       - type: zip
-        url: https://maven.repository.redhat.com/ga/io/apicurio/apicurio-registry-distro-connect-converter/2.5.5.Final-redhat-00001/apicurio-registry-distro-connect-converter-2.5.5.Final-redhat-00001.zip
-        sha512sum: 65f6a150feb29c3fff13b0b6e31e135c56df83e47bbd91b296abf08b4ce444e71c96189e68cb845bc11003716cf2969aea46ecfc471f612aa221cf2efd4c2b44
-
-
-
+        url: https://maven.repository.redhat.com/ga/io/apicurio/apicurio-registry-distro-connect-converter/2.5.9.Final-redhat-00001/apicurio-registry-distro-connect-converter-2.5.9.Final-redhat-00001.zip
+        sha512sum: 81f57991791f87ba8d9c9c2bc8392bc1cf927a14838a33fcdf1fb04fb0a203cc5370f9d43b95069c1c9c90ce776999dfa945abca601b2b6d2a0b44fe0beff329
 
   replicas: 1
   bootstrapServers: single-node-cluster-kafka-bootstrap:9092

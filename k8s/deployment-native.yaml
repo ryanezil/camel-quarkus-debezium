@@ -5,29 +5,26 @@ metadata:
   labels:
     app.openshift.io/runtime: quarkus
     app.kubernetes.io/version: 2.0.0-SNAPSHOT
-    app.kubernetes.io/name: camel-quarkus-dbz
-  name: camel-quarkus-dbz
+    app.kubernetes.io/name: camel-quarkus-dbz-native
+  name: camel-quarkus-dbz-native
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/version: 2.0.0-SNAPSHOT
-      app.kubernetes.io/name: camel-quarkus-dbz
+      app.kubernetes.io/name: camel-quarkus-dbz-native
   template:
     metadata:
       labels:
         app.openshift.io/runtime: quarkus
         app.kubernetes.io/version: 2.0.0-SNAPSHOT
-        app.kubernetes.io/name: camel-quarkus-dbz
+        app.kubernetes.io/name: camel-quarkus-dbz-native
     spec:
       containers:
-        - env:
-            - name: JAVA_APP_JAR
-              value: /deployments/quarkus-run.jar
-          envFrom:
+        - envFrom:
             - secretRef:
                 name: camel-quarkus-dbz-configuration
-          image: quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT
+          image: quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -39,7 +36,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             timeoutSeconds: 10
-          name: camel-quarkus-dbz
+          name: camel-quarkus-dbz-native
           ports:
             - containerPort: 8080
               name: http

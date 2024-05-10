@@ -55,83 +55,165 @@ You can run your application in dev mode that enables live coding using:
 
 ## Packaging and running the application
 
+From now on, everything has been tested with Java Open-JDK 21. Ensure you are using that version by setting your `JAVA_HOME` env-var with the proper directory location.
+
+In my installation:
+
+```shell script
+export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
+```
+
 The application can be packaged using:
 ```shell script
-./mvnw package
+./mvnw clean package
 ```
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+Then, you can run the application by using `java -jar target/quarkus-app/quarkus-run.jar`. Before running it locally, **you must define** the required environment variables, URLs, etc., in order to make it work.
 
 If you want to build an _über-jar_, execute the following command:
 ```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+./mvnw clean package -Dquarkus.package.type=uber-jar
 ```
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
 
-## Creating a native executable
+### Creating a native executable
 
 You can create a native executable using: 
 ```shell script
-./mvnw package -Dnative
+./mvnw clean package -Dnative
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
 ```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+./mvnw clean package -Dnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
+Then you can execute your native executable with: `./target/code-with-quarkus-2.0.0-SNAPSHOT-runner`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
 
 
 ## Building Application Image
 
-This microservice is already built (not native) and the image is available here: ```quay.io/ryanezil/camel-quarkus-dbz:1.0.0-SNAPSHOT```.
+This microservice is already built (both native and non-native) and the images is available here:
 
-### How to build
+* ```quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT```.
+* ```quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT```.
+
+### How to build - Non-native image
 
 1. Package application
 
 ```bash
-# Ensure you are using java-17
-# export JAVA_HOME=/etc/alternatives/java_sdk_17_openjdk/
+# Ensure you are using java-21
+# export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
 
 ./mvnw clean package
 ```
 
 2. Build container image
 
+   Remember to tag the result image with your desired target repository.
+
 ```bash
-podman build -f src/main/docker/Dockerfile.jvm -t quay.io/ryanezil/camel-quarkus-dbz:1.0.0-SNAPSHOT .
+podman build -f src/main/docker/Dockerfile.jvm -t quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT .
 ```
 
 3. Upload to image registry
 
 ```bash
-podman push quay.io/ryanezil/camel-quarkus-dbz:1.0.0-SNAPSHOT   
+podman push quay.io/ryanezil/camel-quarkus-dbz:2.0.0-SNAPSHOT
 ```
+
+
+### How to build - Native image
+
+
+1. Package application
+
+```bash
+# Ensure you are using java-21
+# export JAVA_HOME=/etc/alternatives/java_sdk_21_openjdk/
+
+./mvnw clean package -Dnative -Dquarkus.native.container-build=true
+```
+
+2. Build container image
+
+   Remember to tag the result image with your desired target repository.
+
+```bash
+podman build -f src/main/docker/Dockerfile.native-micro -t quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT .
+```
+
+3. Upload to image registry
+
+```bash
+podman push quay.io/ryanezil/camel-quarkus-dbz-native:2.0.0-SNAPSHOT
+```
+
+## Prepare OpenShift environment
+
+In order to deploy this Quarkus-Camel4 microservice, you need the following components already configured and running:
+
+* MariaDB
+* MongoDB
+* AMQ Streams:
+  * Kafka
+  * kafka Connect
+    * MySql Debezium connector
+* Apicurio Service Registry
+
+In the [OpenShift](./openshift) directory a set of scripts are included in order to ease the deployment. You can run all of them following the sequence number:
+
+* 00-deploy-mariadb.sh
+* 10-deploy-amq-streams.sh
+* 20-deploy-mongodb-sh
+* 30-deploy-service-registry.sh
+* 40-deploy-mysql-debezium-connector.sh
 
 
 ## Deploying the microservice on OpenShift
 
 1. Create a target namespace
 
-```bash
-oc new-project camel-integration
-```
+   ```bash
+   oc new-project camel-integration
+   ```
 
 2. Create secret from env-vars file
 
-```bash
-oc create secret generic camel-quarkus-dbz-configuration --from-env-file=k8s/configuration.env
-```
+   ```bash
+   oc create secret generic camel-quarkus-dbz-configuration --from-env-file=k8s/configuration.env
+   ```
 
-3. Deploy application
+3. Create configmap containing all JSTL mappers
 
-```bash
-oc apply -f k8s/deployment.yaml
-```
+   Mappers are externalized in order to be accessible by native and non-native images.
+
+   Change the source path `src/main/resources/` as needed depending on where you are running the following command:
+
+   ```bash
+   oc create configmap jslt-mappers-cm --from-file=src/main/resources/jslt-mappers/
+   ```
+
+4. Deploy application
+
+   **Non native** deployment:
+
+   Deploy the non-native image from the image registry:
+
+   ```bash
+   oc apply -f k8s/deployment.yaml
+   ```
+
+   **Native** deployment:
+
+   Deploy the native image from the image registry:
+
+   ```bash
+   oc apply -f k8s/deployment-native.yaml
+   ```

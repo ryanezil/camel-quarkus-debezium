@@ -29,12 +29,17 @@ spec:
         ports:
         - containerPort: 3306
           protocol: TCP
-        resources: {}
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
         volumeMounts:
         - mountPath: /var/lib/mysql
           name: msusers-volume-1
         - mountPath: /etc/mysql/conf.d/
           name: mariadb-config
+        - mountPath: /docker-entrypoint-initdb.d/
+          name: country-users-table-schemas
       terminationGracePeriodSeconds: 30
       volumes:
       - emptyDir: {}
@@ -42,6 +47,9 @@ spec:
       - configMap:
           name: mariadb-config
         name: mariadb-config
+      - configMap:
+          name: country-users-table-schemas
+        name: country-users-table-schemas
 
 ---
 

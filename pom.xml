@@ -18,7 +18,7 @@
     <!-- Release notes for Red Hat build of Apache Camel 4.0 -->
     <!-- https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.0/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index -->
     <!-- Get the latest 3.2.x version from https://maven.repository.redhat.com/ga/com/redhat/quarkus/platform/quarkus-bom -->
-    <quarkus.platform.version>3.2.10.Final-redhat-00002</quarkus.platform.version>
+    <quarkus.platform.version>3.2.12.Final-redhat-00002</quarkus.platform.version>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
 
     <!-- Tests are unstable -->
