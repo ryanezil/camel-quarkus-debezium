@@ -2,7 +2,7 @@
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework. If you want to learn more about Quarkus, please visit its website: https://quarkus.io .
 
-The microservice is implemented using [Red Hat build of Apache Camel for Quarkus](https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.0/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index) and [Camel 4.0.0](https://camel.apache.org/releases/release-4.0.0).
+The microservice is implemented using [Red Hat build of Apache Camel for Quarkus](https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.4/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index) and [Camel 4.4.0 LTS](https://camel.apache.org/releases/release-4.4.0).
 
 ## Scenario
 
