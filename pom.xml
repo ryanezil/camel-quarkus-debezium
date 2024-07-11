@@ -6,10 +6,10 @@
   <artifactId>camel-quarkus-dbz</artifactId>
   <version>2.0.0-SNAPSHOT</version>
   <properties>
-    <compiler-plugin.version>3.11.0</compiler-plugin.version>
-    <maven.compiler.release>17</maven.compiler.release>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.source>17</maven.compiler.source>        
+    <compiler-plugin.version>3.12.1</compiler-plugin.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -18,8 +18,8 @@
     <!-- Release notes for Red Hat build of Apache Camel 4.0 -->
     <!-- https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel/4.0/html-single/release_notes_for_red_hat_build_of_apache_camel_for_quarkus/index -->
     <!-- Get the latest 3.2.x version from https://maven.repository.redhat.com/ga/com/redhat/quarkus/platform/quarkus-bom -->
-    <quarkus.platform.version>3.2.12.Final-redhat-00002</quarkus.platform.version>
-    <surefire-plugin.version>3.0.0</surefire-plugin.version>
+    <quarkus.platform.version>3.8.5.redhat-00003</quarkus.platform.version>
+    <surefire-plugin.version>3.2.5</surefire-plugin.version>
 
     <!-- Tests are unstable -->
     <skipTests>true</skipTests>
@@ -113,6 +113,23 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-apicurio-registry-avro</artifactId>
     </dependency>
+
+    <!-- Metrics -->
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-microprofile-health</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-micrometer</artifactId>
+     </dependency>
+
+     <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+     </dependency>
+
 
     <!-- OpenShift deployments extension -->
     <dependency>
